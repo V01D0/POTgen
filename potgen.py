@@ -1,3 +1,11 @@
+"""
+Binary Triangle
+This script generates .po files for a given .pot file
+@author : V01D0
+@copyright : https://pryv8.org
+"""
+
+
 from bs4 import BeautifulSoup
 import re
 from googletrans import Translator
