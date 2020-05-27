@@ -1,5 +1,5 @@
 """
-Binary Triangle
+POTgen
 This script generates .po files for a given .pot file
 @author : V01D0
 @copyright : https://pryv8.org
