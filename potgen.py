@@ -30,10 +30,6 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\\n"
 """
 
-heading2 = heading
-
-print(heading2)
-
 for lang in soup.find_all('code'):
     lang = str(lang.getText())
     filename = lang+".po"
