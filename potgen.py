@@ -7,30 +7,49 @@ This script generates .po files for a given .pot file
 @copyright : https://pryv8.org
 """
 
-from bs4 import BeautifulSoup
+import sys
 import re
-from googletrans import Translator
-import requests
 import datetime
 import fileinput
-from langcodes import Language
 from pathlib import Path
+from langcodes import Language
+from googletrans import Translator
+import requests
+from bs4 import BeautifulSoup
 
-filename = Path("google.langs")
-if filename.is_file():
-    print("google.langs does exist... not downloading...")
-    f2 = open(filename,"r+")
-    data = f2.read()
-    f2.close()
+if len(sys.argv) <= 1:
+    print(f"POT file doesn't exist, can't continue...")
+    sys.exit()
+
+POT_FILE = Path(sys.argv[1])
+
+if POT_FILE.is_file() is not False:
+    F2 = open(POT_FILE, "r")
+    POT_DATA = F2.read()
+    F2.close()
+else:
+    print(f"POT file {POT_FILE} doesn't exist, can't continue...")
+    sys.exit()
+
+HEAD = POT_DATA.split("\n")
+
+print(HEAD)
+sys.exit()
+
+FILENAME = Path("google.langs.html")
+if FILENAME.is_file():
+    F2 = open(FILENAME, "r")
+    DATA = F2.read()
+    F2.close()
 else:
     print("google.langs doesn't exist... downloading...")
-    r = requests.get("https://cloud.google.com/translate/docs/languages")
-    data = r.text
-    f2 = open(filename, "wt")
-    f2.write(data)
-    f2.close()
+    R = requests.get("https://cloud.google.com/translate/docs/languages")
+    DATA = R.text
+    F2 = open(FILENAME, "wt")
+    F2.write(DATA)
+    F2.close()
 
-soup = BeautifulSoup(data, "html.parser")
+SOUP = BeautifulSoup(DATA, "html.parser")
 
 """
 Some general observation
@@ -39,7 +58,7 @@ Some general observation
     needs to pull missing msgid's from pot file and merge in the po files
 """
 
-head = """
+HEAD = """
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the geocaching.evilbunny package.
@@ -49,7 +68,7 @@ head = """
 msgid ""
 msgstr ""
 "Project-Id-Version: geocaching.evilbunny\\n"
-"Report-Msgid-Bugs-To: \\n"
+"Report-Msgid-Bugs-To: <https://github.com/evilbunny2008/geocaching/issues>\\n"
 "POT-Creation-Date: 2020-05-24 12:19+0000\\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\\n"
@@ -61,19 +80,20 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=n > 1;\n"
 """
 
-for lang in soup.find_all('code'):
+for lang in SOUP.find_all('code'):
+    heading = HEAD
     curlang = str(lang.getText())
     if curlang == 'en':
-        continue;
+        continue
 
-    heading = head
-    filename = curlang+".po"
-    f2 = open(filename,"wt")
+    filename = curlang + ".po"
+    f2 = open(filename, "wt")
     now = datetime.datetime.now(datetime.timezone.utc)
     date = str(now.year).zfill(4) + "-" + str(now.month).zfill(2) + "-" + str(now.day).zfill(2)
     date += " " + str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + "+0000"
     language = Language.get(curlang).language_name('en')
-    heading = heading.replace('SOME DESCRIPTIVE TITLE.', f"{language} translation for geocaching.evilbunny")
+    heading = heading.replace('SOME DESCRIPTIVE TITLE.',
+                              f"{language} translation for geocaching.evilbunny")
     heading = heading.replace('YEAR-MO-DA HO:MI+ZONE', date)
     heading = heading.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate <{curlang}@li.org>")
     heading = heading.replace('LANGUAGE <LL@li.org>', f"LANGUAGE <{curlang}@li.org>")
