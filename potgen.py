@@ -32,8 +32,10 @@ else:
     sys.exit()
 
 HEAD = POT_DATA.split("\n")
+for line in HEAD:
+    print(line)
 
-print(HEAD)
+#print(HEAD)
 sys.exit()
 
 FILENAME = Path("google.langs.html")
@@ -101,3 +103,5 @@ for lang in SOUP.find_all('code'):
     heading = heading.replace('CHARSET', f"UTF-8")
     f2.write(heading)
     f2.close()
+
+
