@@ -48,6 +48,7 @@ for lang in soup.find_all('code'):
     f2.close()
     f2 = open(filename,"r+")
     data = f2.read()
+    data = data.replace('SOME DESCRIPTIVE TITLE.', f"{lang} translation for geocaching.evilbunny")
     data = data.replace('YEAR-MO-DA HO:MI+ZONE',date)
     data = data.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate {lang}@li.org")
     data = data.replace('LANGUAGE <LL@li.org>', f"LANGUAGE <{lang}@li.org>")
