@@ -19,6 +19,7 @@ data = r.text
 soup = BeautifulSoup(data,"html.parser")
 
 """
+Some general observation
 * Really needs to get the header from the most recent POT file
 * If POT POT-Creation-Date is later than the PO-Revision-Date this script
     needs to pull missing msgid's from pot file and merge in the po files
