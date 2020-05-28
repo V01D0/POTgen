@@ -1,2 +1,3 @@
 googletrans
 beautifulsoup4
+langcodes
