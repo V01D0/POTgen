@@ -32,9 +32,13 @@ else:
     sys.exit()
 
 HEAD = POT_DATA.split("\n")
+msgids = []
 for line in HEAD:
     print(line)
+    if line.startswith("msgid"):
+        msgids.append(line.strip('msgid'))
 
+print(msgids)
 #print(HEAD)
 sys.exit()
 
