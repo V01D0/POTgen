@@ -62,8 +62,11 @@ msgstr ""
 """
 
 for lang in soup.find_all('code'):
-    heading = head
     curlang = str(lang.getText())
+    if curlang == 'en':
+        continue;
+
+    heading = head
     filename = curlang+".po"
     f2 = open(filename,"wt")
     now = datetime.datetime.now(datetime.timezone.utc)
