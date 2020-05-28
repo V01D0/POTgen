@@ -13,6 +13,7 @@ from googletrans import Translator
 import requests
 import datetime
 import fileinput
+from langcodes import *
 
 r = requests.get("https://cloud.google.com/translate/docs/languages")
 data = r.text
@@ -24,6 +25,8 @@ Some general observation
 * If POT POT-Creation-Date is later than the PO-Revision-Date this script
     needs to pull missing msgid's from pot file and merge in the po files
 """
+
+pofiles = []
 
 heading = """
 # SOME DESCRIPTIVE TITLE.
@@ -50,6 +53,7 @@ msgstr ""
 for lang in soup.find_all('code'):
     lang = str(lang.getText())
     filename = lang+".po"
+    pofiles.append(filename)
     f2 = open(filename,"wt")
     now = datetime.datetime.now(datetime.timezone.utc)
     date = str(now.year) + "-" + str(now.month) + "-" + str(now.day) + " " + str(now.hour) + ":" + str(now.minute) + "+0000"
@@ -57,10 +61,20 @@ for lang in soup.find_all('code'):
     f2.close()
     f2 = open(filename,"r+")
     data = f2.read()
+    language = Language.get(lang).language_name('en')
+    f2.truncate(0)
     data = data.replace('SOME DESCRIPTIVE TITLE.', f"{lang} translation for geocaching.evilbunny")
     data = data.replace('YEAR-MO-DA HO:MI+ZONE',date)
     data = data.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate {lang}@li.org")
-    data = data.replace('LANGUAGE <LL@li.org>', f"LANGUAGE <{lang}@li.org>")
+    data = data.replace('LANGUAGE <LL@li.org>', f"{language} <{lang}@li.org>")
     data = data.replace('Language: ', f"Language: {lang}")
     data = data.replace('CHARSET', f"UTF-8")
     f2.write(data)
+'''for line in potfile:
+    if line.startswith("msgid"):
+    line = line.strip("msgid")
+    line = line.replace('"', '')
+    lines.append(line)
+
+for files in pofiles:
+   ''' 
