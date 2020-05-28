@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 
 """
 POTgen
@@ -13,11 +13,21 @@ from googletrans import Translator
 import requests
 import datetime
 import fileinput
-from langcodes import *
+from langcodes import Language
 
-r = requests.get("https://cloud.google.com/translate/docs/languages")
-data = r.text
-soup = BeautifulSoup(data,"html.parser")
+filename = Path("google.langs")
+if filename.is_file():
+    f2 = open(filename,"r+")
+    data = f2.read()
+    f2.close()
+else:
+    r = requests.get("https://cloud.google.com/translate/docs/languages")
+    data = r.text
+    f2 = open(filename, "wt")
+    f2.write(data)
+    f2.close()
+
+soup = BeautifulSoup(data, "html.parser")
 
 """
 Some general observation
@@ -25,8 +35,6 @@ Some general observation
 * If POT POT-Creation-Date is later than the PO-Revision-Date this script
     needs to pull missing msgid's from pot file and merge in the po files
 """
-
-pofiles = []
 
 heading = """
 # SOME DESCRIPTIVE TITLE.
@@ -37,7 +45,7 @@ heading = """
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: app.name\\n"
+"Project-Id-Version: geocaching.evilbunny\\n"
 "Report-Msgid-Bugs-To: \\n"
 "POT-Creation-Date: 2020-05-24 12:19+0000\\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\\n"
@@ -51,30 +59,18 @@ msgstr ""
 """
 
 for lang in soup.find_all('code'):
-    lang = str(lang.getText())
-    filename = lang+".po"
-    pofiles.append(filename)
+    curlang = str(lang.getText())
+    filename = curlang+".po"
     f2 = open(filename,"wt")
     now = datetime.datetime.now(datetime.timezone.utc)
-    date = str(now.year) + "-" + str(now.month) + "-" + str(now.day) + " " + str(now.hour) + ":" + str(now.minute) + "+0000"
+    date = str(now.year).zfill(4) + "-" + str(now.month).zfill(2) + "-" + str(now.day).zfill(2) +
+           " " + str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + "+0000"
+    language = Language.get(curlang).language_name('en')
+    heading = heading.replace('SOME DESCRIPTIVE TITLE.', f"{language} translation for geocaching.evilbunny")
+    heading = heading.replace('YEAR-MO-DA HO:MI+ZONE',date)
+    heading = heading.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate {curlang}@li.org")
+    heading = heading.replace('LANGUAGE <LL@li.org>', f"LANGUAGE <{curlang}@li.org>")
+    heading = heading.replace('Language: ', f"Language: {curlang}")
+    heading = heading.replace('CHARSET', f"UTF-8")
     f2.write(heading)
     f2.close()
-    f2 = open(filename,"r+")
-    data = f2.read()
-    language = Language.get(lang).language_name('en')
-    f2.truncate(0)
-    data = data.replace('SOME DESCRIPTIVE TITLE.', f"{lang} translation for geocaching.evilbunny")
-    data = data.replace('YEAR-MO-DA HO:MI+ZONE',date)
-    data = data.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate {lang}@li.org")
-    data = data.replace('LANGUAGE <LL@li.org>', f"{language} <{lang}@li.org>")
-    data = data.replace('Language: ', f"Language: {lang}")
-    data = data.replace('CHARSET', f"UTF-8")
-    f2.write(data)
-'''for line in potfile:
-    if line.startswith("msgid"):
-    line = line.strip("msgid")
-    line = line.replace('"', '')
-    lines.append(line)
-
-for files in pofiles:
-   ''' 
