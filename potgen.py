@@ -1,3 +1,5 @@
+#!/usr/bin/python2
+
 """
 POTgen
 This script generates .po files for a given .pot file
