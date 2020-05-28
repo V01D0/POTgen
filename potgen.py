@@ -14,13 +14,16 @@ import requests
 import datetime
 import fileinput
 from langcodes import Language
+from pathlib import Path
 
 filename = Path("google.langs")
 if filename.is_file():
+    print("google.langs does exist... not downloading...")
     f2 = open(filename,"r+")
     data = f2.read()
     f2.close()
 else:
+    print("google.langs doesn't exist... downloading...")
     r = requests.get("https://cloud.google.com/translate/docs/languages")
     data = r.text
     f2 = open(filename, "wt")
@@ -36,7 +39,7 @@ Some general observation
     needs to pull missing msgid's from pot file and merge in the po files
 """
 
-heading = """
+head = """
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the geocaching.evilbunny package.
@@ -59,16 +62,17 @@ msgstr ""
 """
 
 for lang in soup.find_all('code'):
+    heading = head
     curlang = str(lang.getText())
     filename = curlang+".po"
     f2 = open(filename,"wt")
     now = datetime.datetime.now(datetime.timezone.utc)
-    date = str(now.year).zfill(4) + "-" + str(now.month).zfill(2) + "-" + str(now.day).zfill(2) +
-           " " + str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + "+0000"
+    date = str(now.year).zfill(4) + "-" + str(now.month).zfill(2) + "-" + str(now.day).zfill(2)
+    date += " " + str(now.hour).zfill(2) + ":" + str(now.minute).zfill(2) + "+0000"
     language = Language.get(curlang).language_name('en')
     heading = heading.replace('SOME DESCRIPTIVE TITLE.', f"{language} translation for geocaching.evilbunny")
-    heading = heading.replace('YEAR-MO-DA HO:MI+ZONE',date)
-    heading = heading.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate {curlang}@li.org")
+    heading = heading.replace('YEAR-MO-DA HO:MI+ZONE', date)
+    heading = heading.replace('FULL NAME <EMAIL@ADDRESS>', f"Google Translate <{curlang}@li.org>")
     heading = heading.replace('LANGUAGE <LL@li.org>', f"LANGUAGE <{curlang}@li.org>")
     heading = heading.replace('Language: ', f"Language: {curlang}")
     heading = heading.replace('CHARSET', f"UTF-8")
