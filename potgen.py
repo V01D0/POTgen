@@ -15,6 +15,7 @@ from pathlib import Path
 from langcodes import Language
 from googletrans import Translator
 import requests
+import json
 from bs4 import BeautifulSoup
 
 if len(sys.argv) <= 1:
@@ -35,8 +36,9 @@ HEAD = POT_DATA.split("\n")
 msgids = []
 for line in HEAD:
     print(line)
-    if line.startswith("msgid"):
-        msgids.append(line.strip('msgid'))
+    if line.startswith('msgid "'):
+        line = line[7:len(line) - 1]
+        msgids.append(line)
 
 print(msgids)
 #print(HEAD)
@@ -108,4 +110,23 @@ for lang in SOUP.find_all('code'):
     f2.write(heading)
     f2.close()
 
+class TransObj(object):
+    """ translation object """
 
+    lang = ""
+    msgid = ""
+    msgstr = ""
+    comments = ""
+
+    def __init__(self):
+        pass
+
+    def __str__(self):
+
+        output = {}
+        output['lang'] = self.lang
+        output['msgid'] = self.msgid
+        output['msgstr'] = self.msgstr
+        output['comments'] = self.comments
+
+        return json.dumps(output)
