@@ -69,6 +69,7 @@ for lang in SOUP.find_all('code'):
 
     POT_DATA.metadata['Language-Team'] = language + ' <' + curlang + '@li.org>'
     POT_DATA.metadata['Language'] = curlang
+    print("Generating " + curlang + ".po")
 
     for i in range(len(POT_DATA)):
         tmpstr = POT_DATA[i].msgid.replace('%1', '__')
