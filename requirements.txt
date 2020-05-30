@@ -1,3 +1,4 @@
 googletrans
 beautifulsoup4
 langcodes
+polib
