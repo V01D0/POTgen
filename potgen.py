@@ -69,6 +69,7 @@ for lang in SOUP.find_all('code'):
         print(filename, " doesn't exist, processing...")
 
     language = Language.get(curlang).language_name('en')
+    print("Generating "+curlang+".po")
 
     POT_DATA.metadata['Language-Team'] = language + ' <' + curlang + '@li.org>'
     POT_DATA.metadata['Language'] = curlang

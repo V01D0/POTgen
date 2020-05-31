@@ -1,4 +1,4 @@
-googletrans
 beautifulsoup4
 langcodes
 polib
+google-cloud-translate==2.0.1
