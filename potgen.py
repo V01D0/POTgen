@@ -11,10 +11,10 @@ import sys
 import datetime
 from pathlib import Path
 from langcodes import Language
-from googletrans import Translator
 import requests
 import polib
 from bs4 import BeautifulSoup
+from google.cloud import translate_v2 as translate
 
 if len(sys.argv) <= 1:
     print(f"POT file doesn't exist, can't continue...")
@@ -51,29 +51,34 @@ else:
     F2.write(DATA)
     F2.close()
 
-TRANS = Translator()
-
+TRANS = translate.Client()
 SOUP = BeautifulSoup(DATA, "html.parser")
 
 for lang in SOUP.find_all('code'):
     curlang = str(lang.getText())
-    if curlang == 'en' or curlang == 'la':
+    if curlang == 'en' or curlang == 'la' or curlang == 'ceb':
+        continue
+    if curlang == 'zh-CN' or curlang == 'zh-TW':
         continue
 
     filename = Path(curlang + ".po")
     if filename.is_file():
         print(filename, " already exists, skipping...")
         continue
+    else:
+        print(filename, " doesn't exist, processing...")
 
     language = Language.get(curlang).language_name('en')
 
     POT_DATA.metadata['Language-Team'] = language + ' <' + curlang + '@li.org>'
     POT_DATA.metadata['Language'] = curlang
-    print("Generating " + curlang + ".po")
 
     for i in range(len(POT_DATA)):
         tmpstr = POT_DATA[i].msgid.replace('%1', '__')
-        POT_DATA[i].msgstr = TRANS.translate(tmpstr, dest=curlang, src='en').text
+        tmpTrans = TRANS.translate(tmpstr,
+                                   source_language='en',
+                                   target_language=curlang)['translatedText']
+        POT_DATA[i].msgstr = tmpTrans
         POT_DATA[i].msgstr = POT_DATA[i].msgstr.replace('__', '%1')
 
     F2 = open(filename, 'wt')
