@@ -4,9 +4,11 @@ import sys
 import os
 from pathlib import Path
 from google.cloud import translate_v2 as translate
+import mtranslate
 import requests
 from bs4 import BeautifulSoup
 # import shutil
+from tqdm import tqdm
 import xml.etree.ElementTree as ET
 
 
@@ -43,15 +45,24 @@ for string in strings:
 
 print(original_texts)
 
-TRANS = translate.Client()
+api = True
+try:
+	TRANS = translate.Client()
+	api = False
+except:
+	print("API not supported")
+
 SOUP = BeautifulSoup(DATA, "html.parser")
 
-for lang in SOUP.find_all('code'):
+skip = ['en', 'la', 'ceb', 'zh-CN', 'zh-TW', 'he', 'mni-Mtei', 'fil']
+
+# print(len(SOUP.find_all('code')))
+
+for lang in tqdm(SOUP.find_all('code')):
+	# print(len(SOUP.find_all('code')))
 	translated_texts = copy.deepcopy(original_texts)
 	curlang = str(lang.getText())
-	if curlang == 'en' or curlang == 'la' or curlang == 'ceb':
-		continue
-	if curlang == 'zh-CN' or curlang == 'zh-TW':
+	if curlang in skip:
 		continue
 	current_directory = os.getcwd()
 	values_directory = os.path.join(current_directory, f"values-{curlang}")
@@ -61,8 +72,11 @@ for lang in SOUP.find_all('code'):
 			tree = ET.parse(f)
 			root = tree.getroot()
 			for k, v in translated_texts.items():
-				translated_string = TRANS.translate(
-					v, source_language='en', target_language=curlang)
+				if not api:
+					translated_string = TRANS.translate(
+						v, source_language='en', target_language=curlang)
+				else:
+					translated_string = mtranslate.translate(v, curlang)
 				for element in root.findall("string"):
 					if element.text == v:
 						element.text = translated_string
