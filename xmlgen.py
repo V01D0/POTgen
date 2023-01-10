@@ -48,8 +48,8 @@ print(original_texts)
 api = True
 try:
 	TRANS = translate.Client()
-	api = False
 except:
+	api = False
 	print("API not supported")
 
 SOUP = BeautifulSoup(DATA, "html.parser")
