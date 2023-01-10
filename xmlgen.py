@@ -72,7 +72,7 @@ for lang in tqdm(SOUP.find_all('code')):
 			tree = ET.parse(f)
 			root = tree.getroot()
 			for k, v in translated_texts.items():
-				if not api:
+				if api:
 					translated_string = TRANS.translate(
 						v, source_language='en', target_language=curlang)
 				else:
