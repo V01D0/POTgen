@@ -1,3 +1,5 @@
+#!/usr/bin/python3
+
 from xml.dom import minidom
 import copy
 import sys
@@ -37,13 +39,13 @@ else:
 for string in strings:
 	child_nodes = len(string.childNodes)
 	name = string.attributes['name'].value
-	print(name)
+	# print(name)
 	for i in range(child_nodes):
-		original_texts.update({name: string.childNodes[i].data})
+		original_texts.update({name: string.childNodes[i].data.encode().decode('unicode_escape')})
 		# print(string.childNodes[i].name)
 		# original_texts.append(string.childNodes[i].data)
 
-print(original_texts)
+# print(original_texts)
 
 api = True
 try:
@@ -81,3 +83,5 @@ for lang in tqdm(SOUP.find_all('code')):
 					if element.text == v:
 						element.text = translated_string
 			tree.write(f'{values_directory}/strings.xml', encoding='utf-8', xml_declaration=True)
+	else:
+		continue
