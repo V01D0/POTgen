@@ -80,4 +80,4 @@ for lang in tqdm(SOUP.find_all('code')):
 				for element in root.findall("string"):
 					if element.text == v:
 						element.text = translated_string
-			tree.write(f'{values_directory}/strings.xml', encoding='utf-8')
+			tree.write(f'{values_directory}/strings.xml', encoding='utf-8', xml_declaration=True)
