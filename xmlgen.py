@@ -41,7 +41,7 @@ for string in strings:
 	name = string.attributes['name'].value
 	# print(name)
 	for i in range(child_nodes):
-		original_texts.update({name: string.childNodes[i].data.encode().decode('unicode_escape')})
+		original_texts.update({name: string.childNodes[i].data.replace("\\'", "'")})
 		# print(string.childNodes[i].name)
 		# original_texts.append(string.childNodes[i].data)
 
@@ -56,7 +56,7 @@ except:
 
 SOUP = BeautifulSoup(DATA, "html.parser")
 
-skip = ['en', 'la', 'ceb', 'zh-CN', 'zh-TW', 'he', 'mni-Mtei', 'fil']
+skip = ['en', 'la', 'ceb', 'zh', 'he', 'mni-Mtei', 'fil', 'jv']
 
 # print(len(SOUP.find_all('code')))
 
@@ -79,8 +79,10 @@ for lang in tqdm(SOUP.find_all('code')):
 						v, source_language='en', target_language=curlang)
 				else:
 					translated_string = mtranslate.translate(v, curlang)
+				translated_string = translated_string.replace("'", "\\'")
+				translated_string = translated_string.replace("...", "…")
 				for element in root.findall("string"):
-					if element.text == v:
+					if element.text.replace("\\'", "'") == v:
 						element.text = translated_string
 			tree.write(f'{values_directory}/strings.xml', encoding='utf-8', xml_declaration=True)
 	else:
