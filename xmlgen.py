@@ -69,7 +69,6 @@ for lang in tqdm(SOUP.find_all('code')):
 	current_directory = os.getcwd()
 	values_directory = os.path.join(current_directory, f"values-{curlang}")
 	if not os.path.exists(values_directory):
-		os.mkdir(values_directory)
 		with open(file_name) as f:
 			tree = ET.parse(f)
 			root = tree.getroot()
@@ -84,6 +83,7 @@ for lang in tqdm(SOUP.find_all('code')):
 				for element in root.findall("string"):
 					if element.text.replace("\\'", "'") == v:
 						element.text = translated_string
+			os.mkdir(values_directory)
 			tree.write(f'{values_directory}/strings.xml', encoding='utf-8', xml_declaration=True)
 	else:
 		continue
